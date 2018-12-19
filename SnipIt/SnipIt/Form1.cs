@@ -18,6 +18,8 @@ namespace SnipIt
         Random rnd = new Random();
         SolidBrush myBrush = new SolidBrush(Color.FromArgb(50, 255, 255, 255));
         bool start = false;
+        [System.Runtime.InteropServices.DllImport("Shell32.dll")]
+        private static extern int SHChangeNotify(int eventId, int flags, IntPtr item1, IntPtr item2);
         public Form1()
         {
             appShortcutToDesktop();
@@ -128,6 +130,7 @@ namespace SnipIt
                 _img.Save(@desktop + @"\SnipIt_" + ourId + ".png", ImageFormat.Png);
                 Clipboard.SetImage(_img);
             }
+            SHChangeNotify(0x8000000, 0x1000, IntPtr.Zero, IntPtr.Zero);
             Application.Exit();
         }
     }
