@@ -119,7 +119,7 @@ namespace SnipIt
                 Bitmap OriginalImage = new Bitmap(pictureBox1.Image, pictureBox1.Width, pictureBox1.Height);
                 Bitmap _img = new Bitmap(selectWidth, selectHeight);
                 Graphics g = Graphics.FromImage(_img);
-                g.InterpolationMode = InterpolationMode.HighQuality;
+                g.InterpolationMode = InterpolationMode.High;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 g.CompositingQuality = CompositingQuality.HighQuality;
                 g.DrawImage(OriginalImage, 0, 0, rect, GraphicsUnit.Pixel);
