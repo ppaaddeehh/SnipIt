@@ -21,12 +21,13 @@ namespace SnipIt
         int selectY;
         int selectWidth;
         int selectHeight;
-        public Pen selectPen;
         Random rnd = new Random();
+        SolidBrush myBrush = new SolidBrush(Color.FromArgb(50, 255, 255, 255));
         //This variable control when you start the right click
         bool start = false;
         public Form1()
         {
+            appShortcutToDesktop();
             InitializeComponent();
         }
 
@@ -62,8 +63,7 @@ namespace SnipIt
                 pictureBox1.Refresh();
                 selectWidth = e.X - selectX;
                 selectHeight = e.Y - selectY;
-                pictureBox1.CreateGraphics().DrawRectangle(selectPen,
-                          selectX, selectY, selectWidth, selectHeight);
+                pictureBox1.CreateGraphics().FillRectangle(myBrush, selectX, selectY, selectWidth, selectHeight);
             }
         }
 
@@ -73,8 +73,6 @@ namespace SnipIt
             {
                 selectX = e.X;
                 selectY = e.Y;
-                selectPen = new Pen(Color.Red, 1);
-                selectPen.DashStyle = DashStyle.DashDotDot;
             }
             pictureBox1.Refresh();
             start = true;
@@ -89,14 +87,29 @@ namespace SnipIt
                 pictureBox1.Refresh();
                 selectWidth = e.X - selectX;
                 selectHeight = e.Y - selectY;
-                pictureBox1.CreateGraphics().DrawRectangle(selectPen, selectX,
+                pictureBox1.CreateGraphics().FillRectangle(myBrush, selectX,
                          selectY, selectWidth, selectHeight);
 
             }
             start = false;
             SaveToClipboard();
         }
+        private void appShortcutToDesktop()
+        {
+            string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            string app = System.Reflection.Assembly.GetExecutingAssembly().Location;
 
+            object shDesktop = (object)"Desktop";
+
+            WshShell shell = new WshShell();
+
+            string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\SnipIt.lnk";
+            IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
+            shortcut.Description = "SnipIt Shortcut";
+            shortcut.Hotkey = "Ctrl+Shift+C";
+            shortcut.TargetPath = app;
+            shortcut.Save();
+        }
         private void SaveToClipboard()
         {
             if (selectWidth > 0)
@@ -111,7 +124,7 @@ namespace SnipIt
                 g.CompositingQuality = CompositingQuality.HighQuality;
                 g.DrawImage(OriginalImage, 0, 0, rect, GraphicsUnit.Pixel);
                 var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                _img.Save(@desktop + @"\SWAG.png", ImageFormat.Png);
+                _img.Save(@desktop + @"\SnipIt_" + rnd.Next(1, 1000) + ".png", ImageFormat.Png);
                 Clipboard.SetImage(_img);
             }
             Application.Exit();
