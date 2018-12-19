@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using IWshRuntimeLibrary;
 
@@ -16,14 +10,13 @@ namespace SnipIt
 {
     public partial class Form1 : Form
     {
-        //These variables control the mouse position
+
         int selectX;
         int selectY;
         int selectWidth;
         int selectHeight;
         Random rnd = new Random();
         SolidBrush myBrush = new SolidBrush(Color.FromArgb(50, 255, 255, 255));
-        //This variable control when you start the right click
         bool start = false;
         public Form1()
         {
@@ -41,7 +34,6 @@ namespace SnipIt
             graphics.CopyFromScreen(0, 0, 0, 0, printscreen.Size);
             using (MemoryStream s = new MemoryStream())
             {
-                //save graphic variable into memory
                 printscreen.Save(s, ImageFormat.Bmp);
                 pictureBox1.Size = new System.Drawing.Size(Width, Height);
                 pictureBox1.Image = Image.FromStream(s);
@@ -69,7 +61,7 @@ namespace SnipIt
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
             {
                 selectX = e.X;
                 selectY = e.Y;
@@ -92,7 +84,7 @@ namespace SnipIt
 
             }
             start = false;
-            SaveToClipboard();
+            SaveToClipboardAsync();
         }
         private void appShortcutToDesktop()
         {
@@ -110,7 +102,15 @@ namespace SnipIt
             shortcut.TargetPath = app;
             shortcut.Save();
         }
-        private void SaveToClipboard()
+        public Byte[] BitmapToArray(Bitmap bitmap)
+        {
+            using (MemoryStream stream = new MemoryStream())
+            {
+                bitmap.Save(stream, ImageFormat.Bmp);
+                return stream.ToArray();
+            }
+        }
+        private void SaveToClipboardAsync()
         {
             if (selectWidth > 0)
             {
@@ -123,8 +123,9 @@ namespace SnipIt
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 g.CompositingQuality = CompositingQuality.HighQuality;
                 g.DrawImage(OriginalImage, 0, 0, rect, GraphicsUnit.Pixel);
+                int ourId = rnd.Next(1, 1000);
                 var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                _img.Save(@desktop + @"\SnipIt_" + rnd.Next(1, 1000) + ".png", ImageFormat.Png);
+                _img.Save(@desktop + @"\SnipIt_" + ourId + ".png", ImageFormat.Png);
                 Clipboard.SetImage(_img);
             }
             Application.Exit();
